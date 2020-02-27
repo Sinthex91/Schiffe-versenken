@@ -1,22 +1,4 @@
 /*
-VIEW
-*/
-let view = {
-  displayMessage: function(msg) {
-    let message = document.getElementById("message");
-    message.innerHTML = msg;
-  },
-  displayHit: function(location) {
-    let cell = document.getElementById(location);
-    cell.setAttribute("class", "hit");
-  },
-  displayMiss: function(location) {
-    let cell = document.getElementById(location);
-    cell.setAttribute("class", "miss");
-  }
-};
-
-/*
 MODEL
 */
 let model = {
@@ -27,16 +9,16 @@ let model = {
 
   ships: [
     {
-      locations: ["10", "20", "30"],
+      locations: [0, 0, 0],
       hits: ["", "", ""]
     },
     {
-      locations: ["32", "33", "34"],
+      locations: [0, 0, 0],
       hits: ["", "", ""]
     },
     {
-      locations: ["63", "64", "65"],
-      hits: ["", "", "hit"]
+      locations: [0, 0, 0],
+      hits: ["", "", ""]
     }
   ],
 
@@ -71,19 +53,21 @@ let model = {
 
   generateShipLocations: function() {
     let locations;
-    for (i = 0; i < this.numShips; i++) {
+    for (let i = 0; i < this.numShips; i++) {
+      console.log(i);
       do {
         locations = this.generateShip();
       } while (this.collision(locations));
       this.ships[i].locations = locations;
-      // this.numShips++;
     }
+    console.log("Ships array: ");
+    console.log(this.ships);
   },
 
   generateShip: function() {
-    let direction = Math.floor(Math.random() * 2);
-    var row;
-    var col;
+    var direction = Math.floor(Math.random() * 2);
+    var row, col;
+
     if (direction === 1) {
       //Horizontal ausgerichtetes Schiff
       row = Math.floor(Math.random() * this.boardSize);
@@ -93,7 +77,7 @@ let model = {
       row = Math.floor(Math.random() * this.boardSize - this.shipLength);
       col = Math.floor(Math.random() * this.boardSize);
     }
-    let newShipLocation = [];
+    var newShipLocation = [];
     for (var i = 0; i < this.shipLength; i++) {
       if (direction === 1) {
         //Horizontal ausgerichtetes Schiff
@@ -116,6 +100,24 @@ let model = {
       }
     }
     return false;
+  }
+};
+
+/*
+VIEW
+*/
+let view = {
+  displayMessage: function(msg) {
+    let message = document.getElementById("message");
+    message.innerHTML = msg;
+  },
+  displayHit: function(location) {
+    let cell = document.getElementById(location);
+    cell.setAttribute("class", "hit");
+  },
+  displayMiss: function(location) {
+    let cell = document.getElementById(location);
+    cell.setAttribute("class", "miss");
   }
 };
 
@@ -167,12 +169,6 @@ let controller = {
   }
 };
 
-function init() {
-  let fireButton = document.getElementById("fireButton");
-  fireButton.onclick = handleFireButton;
-  guessInput = document.getElementById("guessInput");
-  guessInput.onkeypress = handleKeyPress;
-}
 function handleKeyPress(e) {
   let fireButton = document.getElementById("fireButton");
   if (e.keyCode === 13) {
@@ -181,10 +177,21 @@ function handleKeyPress(e) {
   }
 }
 function handleFireButton() {
-  guessInput = document.getElementById("guessInput");
-  controller.processGuess(guessInput.value);
+  let guessInput = document.getElementById("guessInput");
+  let guess = guessInput.value.toUpperCase();
+
+  controller.processGuess(guess);
 
   guessInput.value = "";
 }
 
 window.onload = init;
+
+function init() {
+  let fireButton = document.getElementById("fireButton");
+  fireButton.onclick = handleFireButton;
+  guessInput = document.getElementById("guessInput");
+  guessInput.onkeypress = handleKeyPress;
+
+  model.generateShipLocations();
+}
